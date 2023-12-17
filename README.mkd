@@ -1,0 +1,53 @@
+NAT-Failover
+============
+
+> [!NOTE]
+> This is specific to my setup. Feel free to fork and change it, or send feature requests to make it more modular.
+
+NAT failover is a system to workaround a flaky DHCP-PD (prefix delegation) system by temporarily adding a NATv6
+Masquerade route when the block is not routed.
+
+Uses a simple pinging system that test the connection through the default IP and one IP that is supposed to be routed.
+If the first one succeeds and the second one fails, adds a `NAT MASQUERADE` rule on the WAN interface (but exclude the
+IP to test). When the IP pings again, removes this rule.
+
+It also pushes an alert directly to Alertmanager.
+
+Installation
+------------
+
+Install cargo through rustup.
+
+Build the project by running:
+```
+cargo build --release
+```
+
+The binary should be built in the `target/release/` directory.
+
+Usage
+-----
+
+```
+Usage: nat-failover [OPTIONS] --iface <IFACE> --from <FROM> --alertmanager-url <ALERTMANAGER_URL>
+
+Options:
+  -i, --iface <IFACE>
+          WAN interface
+  -f, --from <FROM>
+          IP to bind on
+  -t, --to <TO>
+          IP to ping [default: 2001:4860:4860::8888]
+  -r, --retries <RETRIES>
+          Retries [default: 5]
+      --timeout <TIMEOUT>
+          Timeout [default: 500]
+      --interval <INTERVAL>
+          Interval in seconds for the testing and apply or clean the failover [default: 15]
+  -a, --alertmanager-url <ALERTMANAGER_URL>
+          Alertmanager URL
+  -h, --help
+          Print help
+  -V, --version
+          Print version
+```

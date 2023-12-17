@@ -1,0 +1,22 @@
+#!/sbin/openrc-run
+
+name="nat-failover"
+description="Nat-failover"
+
+export RUST_LOG=info
+
+### SET THESE ENV VARIABLES ###
+_IFACE=
+_FROM_ADDR=
+_ALERTMANAGER_URL=
+
+command="/usr/local/bin/nat-failover"
+command_args="--iface ${_IFACE} --from ${_FROM_ADDR} --alertmanager-url ${_ALERTMANAGER_URL}"
+command_background=yes
+pidfile="/run/$RC_SVCNAME.pid"
+error_logger="logger -et '${RC_SVCNAME}' -p3"
+
+depend() {
+	need net
+	use logger
+}
